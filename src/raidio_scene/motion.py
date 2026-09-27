@@ -76,6 +76,37 @@ def light_opacity(opacity: float, strength: float, signal: float) -> float:
     return min(1, max(0, opacity + strength * signal * (1 - opacity)))
 
 
+def reaction_signal(reaction: str, signals: dict[str, float]) -> float:
+    """Attack preserves room energy while adding the causal attack pulse."""
+    if reaction == "attack":
+        return .25 * signals["energy"] + .75 * signals["attack"]
+    if reaction in {"energy", "sustained"}:
+        return signals[reaction]
+    return 0
+
+
+def preview_signals(energy: float, accent_age: float | None) -> dict[str, float]:
+    """An explicitly simulated musical accent for authoring, never beat detection.
+
+    Energy rises quickly, sustained light blooms more slowly, and an attack pulse
+    decays on the native detector's 130 ms timescale. A level of 1 is full-scale.
+    """
+    baseline = min(1, max(0, energy))
+    if accent_age is None or accent_age < 0:
+        return {"energy": baseline, "sustained": baseline, "attack": 0}
+
+    def pulse(rise: float, decay: float) -> float:
+        peak_time = rise * math.log(1 + decay / rise)
+        peak = (1 - math.exp(-peak_time / rise)) * math.exp(-peak_time / decay)
+        return min(1, (1 - math.exp(-accent_age / rise)) * math.exp(-accent_age / decay) / peak)
+
+    return {
+        "energy": baseline + (1 - baseline) * pulse(.04, .45),
+        "sustained": baseline + (1 - baseline) * pulse(.25, 1.1),
+        "attack": math.exp(-accent_age / .13),
+    }
+
+
 def radial_alpha(x: float, y: float) -> int:
     """Coverage at a normalized texture position; linear Canvas radial stops."""
     return round(255 * max(0, 1 - math.hypot(2 * x - 1, 2 * y - 1)))
@@ -91,6 +122,69 @@ def ambient_elements(
     """
     left, top, width, height = (bounds[key] for key in ("x", "y", "width", "height"))
     result: list[dict[str, str | float]] = []
+    if preset == "meteors":
+        for lane in range(2):
+            age = (time + lane * 4.5) % 9
+            if age >= 1.15:
+                continue
+            progress = age / 1.15
+            envelope = math.sin(math.pi * progress)
+            head_x = left + width * (0.12 + 0.40 * lane + 0.42 * progress)
+            head_y = top + height * (0.10 + 0.16 * lane + 0.48 * progress)
+            for segment in range(6):
+                near = segment / 6
+                result.append(
+                    {
+                        "kind": "line",
+                        "x": head_x - width * 0.12 * near,
+                        "y": head_y - height * 0.18 * near,
+                        "width": -width * 0.12 / 6,
+                        "height": -height * 0.18 / 6,
+                        "opacity": envelope * 0.75 * (1 - near) ** 1.8,
+                        "lineWidth": 1 + 1.1 * (1 - near),
+                    }
+                )
+            result.append(
+                {
+                    "kind": "ellipse",
+                    "x": head_x - 2,
+                    "y": head_y - 2,
+                    "width": 4.0,
+                    "height": 4.0,
+                    "opacity": envelope * 0.8,
+                }
+            )
+            result.append(
+                {
+                    "kind": "glow",
+                    "x": head_x - 7,
+                    "y": head_y - 7,
+                    "width": 14.0,
+                    "height": 14.0,
+                    "opacity": envelope * 0.16,
+                }
+            )
+        return result
+    if preset == "reflection":
+        for index in range(18):
+            seed = ((index * 7919 + 13) % 997) / 997
+            across = ((index * 139 + 71) % 997) / 997
+            travel = (index / 18 + time * 0.012) % 1
+            wave = math.sin(time * 0.6 + seed * 13)
+            ripple_width = width * (0.17 + seed * 0.24) * (1 + 0.12 * math.sin(time * 0.45 + index))
+            center_x = left + width * (0.15 + 0.7 * across + 0.08 * wave)
+            result.append(
+                {
+                    "kind": "ellipse",
+                    "x": center_x - ripple_width / 2,
+                    "y": top + travel * height,
+                    "width": ripple_width,
+                    "height": 1.1 + seed * 0.9,
+                    "opacity": math.sin(travel * math.pi)
+                    * (0.25 + 0.35 * (0.5 + 0.5 * math.sin(time * 0.55 + index * 1.7))),
+                }
+            )
+        return result
     if preset in {"mist", "steam"}:
         for index in range(8):
             seed = index * 2.399
@@ -123,18 +217,6 @@ def ambient_elements(
                     "height": 10 + seed * 18,
                     "opacity": alpha * 0.24,
                     "lineWidth": 0.8,
-                }
-            )
-        elif preset == "reflection":
-            wave = math.sin(time * 1.5 + index * 1.8)
-            result.append(
-                {
-                    "kind": "ellipse",
-                    "x": x + wave * 2,
-                    "y": y,
-                    "width": 3 + (wave + 1) * 4,
-                    "height": 1.5,
-                    "opacity": alpha * (0.25 + (wave + 1) * 0.15),
                 }
             )
         else:

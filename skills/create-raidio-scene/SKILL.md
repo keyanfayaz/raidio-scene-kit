@@ -3,8 +3,8 @@ name: create-raidio-scene
 description: Author coordinated, layered Raidio listening scenes with available image tools, inspect them locally, and deliver a validated .raidioscene package for app import.
 ---
 
-Authoring guide **v2**, for scene manifest v2 and Scene Kit v0.1.0. The pinned
-format reference is https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.0/FORMAT.md.
+Authoring guide **v2**, for scene manifest v2 and Scene Kit v0.1.1. The pinned
+format reference is https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.1/FORMAT.md.
 
 Use the user's imagined place, mood, palette and focal objects as the creative
 brief. Read [FORMAT.md](../../FORMAT.md) before authoring layers. Install Scene
@@ -25,7 +25,9 @@ or window frames. Alpha masks belong to the orientation, not a screen crop.
 Inspect mask coverage at full size; no atmosphere should leak onto walls.
 
 Favor a few convincing details: rain beyond a window, quiet drifting dust, a
-slow curtain, warm light spill. Ambient motion has its own time; music controls
+slow curtain, water ripples, an occasional shooting star, warm light spill.
+Use `meteors` only in sky and `reflection` only on water, with exclusion masks
+protecting foreground objects and architecture. Ambient motion has its own time; music controls
 only localized light. Keep uncertain objects still instead of claiming automatic
 segmentation succeeded. Never warp the whole image. No people or text are needed
 unless the user explicitly wants them.

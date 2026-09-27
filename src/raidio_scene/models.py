@@ -64,6 +64,7 @@ class Layer(StrictModel):
         "stars",
         "steam",
         "reflection",
+        "meteors",
     ]
     amplitude: float = Field(default=0.01, ge=0, le=0.05, allow_inf_nan=False)
     speed: float = Field(default=1, ge=0.05, le=3, allow_inf_nan=False)
@@ -97,6 +98,7 @@ class Layer(StrictModel):
                 "stars",
                 "steam",
                 "reflection",
+                "meteors",
             }:
                 raise ValueError("Ambient layers use a procedural preset and no image resource")
         if self.kind == "light" and self.preset != "still":

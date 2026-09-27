@@ -1,0 +1,206 @@
+{
+  "version": 2,
+  "toolkitVersion": "0.1.1",
+  "cases": [
+    {
+      "reaction": "none",
+      "signals": {
+        "energy": 0.0,
+        "attack": 0.0,
+        "sustained": 0.0
+      },
+      "expected": 0
+    },
+    {
+      "reaction": "energy",
+      "signals": {
+        "energy": 0.0,
+        "attack": 0.0,
+        "sustained": 0.0
+      },
+      "expected": 0.0
+    },
+    {
+      "reaction": "attack",
+      "signals": {
+        "energy": 0.0,
+        "attack": 0.0,
+        "sustained": 0.0
+      },
+      "expected": 0.0
+    },
+    {
+      "reaction": "sustained",
+      "signals": {
+        "energy": 0.0,
+        "attack": 0.0,
+        "sustained": 0.0
+      },
+      "expected": 0.0
+    },
+    {
+      "reaction": "none",
+      "signals": {
+        "energy": 0.35,
+        "attack": 0.0,
+        "sustained": 0.35
+      },
+      "expected": 0
+    },
+    {
+      "reaction": "energy",
+      "signals": {
+        "energy": 0.35,
+        "attack": 0.0,
+        "sustained": 0.35
+      },
+      "expected": 0.35
+    },
+    {
+      "reaction": "attack",
+      "signals": {
+        "energy": 0.35,
+        "attack": 0.0,
+        "sustained": 0.35
+      },
+      "expected": 0.0875
+    },
+    {
+      "reaction": "sustained",
+      "signals": {
+        "energy": 0.35,
+        "attack": 0.0,
+        "sustained": 0.35
+      },
+      "expected": 0.35
+    },
+    {
+      "reaction": "none",
+      "signals": {
+        "energy": 0.7,
+        "attack": 1.0,
+        "sustained": 0.4
+      },
+      "expected": 0
+    },
+    {
+      "reaction": "energy",
+      "signals": {
+        "energy": 0.7,
+        "attack": 1.0,
+        "sustained": 0.4
+      },
+      "expected": 0.7
+    },
+    {
+      "reaction": "attack",
+      "signals": {
+        "energy": 0.7,
+        "attack": 1.0,
+        "sustained": 0.4
+      },
+      "expected": 0.925
+    },
+    {
+      "reaction": "sustained",
+      "signals": {
+        "energy": 0.7,
+        "attack": 1.0,
+        "sustained": 0.4
+      },
+      "expected": 0.4
+    },
+    {
+      "reaction": "none",
+      "signals": {
+        "energy": 1.0,
+        "attack": 0.0,
+        "sustained": 1.0
+      },
+      "expected": 0
+    },
+    {
+      "reaction": "energy",
+      "signals": {
+        "energy": 1.0,
+        "attack": 0.0,
+        "sustained": 1.0
+      },
+      "expected": 1.0
+    },
+    {
+      "reaction": "attack",
+      "signals": {
+        "energy": 1.0,
+        "attack": 0.0,
+        "sustained": 1.0
+      },
+      "expected": 0.25
+    },
+    {
+      "reaction": "sustained",
+      "signals": {
+        "energy": 1.0,
+        "attack": 0.0,
+        "sustained": 1.0
+      },
+      "expected": 1.0
+    }
+  ],
+  "previewCases": [
+    {
+      "energy": 0.35,
+      "age": null,
+      "signals": {
+        "energy": 0.35,
+        "sustained": 0.35,
+        "attack": 0
+      }
+    },
+    {
+      "energy": 0.35,
+      "age": 0.0,
+      "signals": {
+        "energy": 0.35,
+        "sustained": 0.35,
+        "attack": 1.0
+      }
+    },
+    {
+      "energy": 0.35,
+      "age": 0.1,
+      "signals": {
+        "energy": 0.9999990373490522,
+        "sustained": 0.7023049875951154,
+        "attack": 0.4633693692311753
+      }
+    },
+    {
+      "energy": 0.35,
+      "age": 0.42,
+      "signals": {
+        "energy": 0.6977496129148283,
+        "sustained": 0.9999962766168727,
+        "attack": 0.039527081643578606
+      }
+    },
+    {
+      "energy": 0.35,
+      "age": 1.5,
+      "signals": {
+        "energy": 0.381548001860774,
+        "sustained": 0.648545118444426,
+        "attack": 9.747872143533838e-06
+      }
+    },
+    {
+      "energy": 0.35,
+      "age": 6.0,
+      "signals": {
+        "energy": 0.3500014322770686,
+        "sustained": 0.3550052822781134,
+        "attack": 9.028992593545614e-21
+      }
+    }
+  ]
+}

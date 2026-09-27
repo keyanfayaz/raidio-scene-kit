@@ -97,7 +97,7 @@ def initialize(path: Path) -> None:
                     "opacity": 0.03,
                     "blend": "screen",
                     "reaction": "sustained",
-                    "strength": 0.15,
+                    "strength": 0.45,
                     "color": "#C7DBE4",
                 },
             ],
@@ -108,7 +108,7 @@ def initialize(path: Path) -> None:
             "title": "Quiet Observatory · starter study",
             "provenance": {
                 "author": "Raidio Scene Kit contributors",
-                "tool": "Scene Kit 0.1.0 · Pillow geometry",
+                "tool": "Scene Kit 0.1.1 · Pillow geometry",
                 "license": "MIT",
                 "sourceDescription": "Original geometric starter; no external images.",
             },

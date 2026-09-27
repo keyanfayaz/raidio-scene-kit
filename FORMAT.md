@@ -35,13 +35,15 @@ color is irrelevant. Use alpha, not an opaque black-and-white image.
 | --- | --- | --- | --- |
 | `foreground` | `still` | Required | Stationary frame, furniture or occluder |
 | `object` | `still`, `sway`, `rotate`, `cloth`, `drift`, `flame` | Required | Independent cutout; only these pixels move |
-| `ambient` | `rain`, `mist`, `dust`, `stars`, `steam`, `reflection` | None | Procedural, clipped atmosphere |
+| `ambient` | `rain`, `mist`, `dust`, `stars`, `steam`, `reflection`, `meteors` | None | Procedural, clipped atmosphere |
 | `light` | `still` | Optional | Static texture or radial color glow, optionally music-reactive |
 
 No layer executes code. `blend` is `normal` (default) or `screen`; `color` is
 `#RRGGBB`, default `#FFD6A0`. Opacity defaults to 1 and remains in `[0,1]`.
 Ambient presets remain independent of music. Stars/dust drift gently; rain falls;
-steam rises; mist drifts; reflection adds restrained horizontal shimmer.
+mist/steam drift softly; reflection draws long horizontal water ripples. Meteors
+are sparse diagonal shooting stars with a smoothly fading tail, clipped to sky
+coverage. Neither preset moves the underlying water, sky, architecture or masks.
 
 For object motion, let `t = elapsedSeconds * speed + phase`:
 
@@ -62,12 +64,19 @@ base is essential because motion exposes the pixels underneath.
 
 Only light layers accept `reaction`: `none` (default), `energy`, `attack` or
 `sustained`. These denote smoothed amplitude, a causal musical attack, and a slow
-energy envelope, not verified beat tracking. `strength` defaults to 0.3 in
+energy envelope, not verified beat tracking. Attack layers preserve an energy
+baseline with `signal = 0.25 * energy + 0.75 * rawAttackPulse`; this leaves room
+for a visible accent even at full steady energy. `strength` defaults to 0.3 in
 `[0,1]`; effective opacity is
 `clamp(opacity + strength * signal * (1 - opacity), 0, 1)`.
 With reactions disabled the signal is zero and baseline opacity remains.
-The preview energy slider drives energy/sustained manually; **Test attack** is
-a synthetic exponentially decaying accent, clearly labeled as a test.
+The preview **Energy baseline** slider drives energy/sustained manually. A value
+of 1 supplies full-scale energy, without silently multiplying the layer's authored
+strength. **Test attack across lights** simulates a musical accent across all
+three channels: raw attack decays over 130 ms, energy rises quickly, and sustained
+light blooms more slowly. It is an authoring test, not a beat detector or a change
+to the native audio measurement pipeline. At full baseline, energy/sustained
+lights are already at their maximum; attack layers still have accent headroom.
 
 Pause, buffering, hidden/background state and animation-off freeze the existing
 object and atmosphere pose; they do not reset its phase or remove its particles.
@@ -77,9 +86,14 @@ use posters. Native and browser effects may differ slightly in rasterization;
 source placement, masks, transforms, bounds and lifecycle must agree.
 
 `motion.py` and `motion.js` implement the same reference equations. Object and
-ambient conformance fixtures in `examples/` are checked by the browser and Python
+ambient and reaction conformance fixtures in `examples/` are checked by the browser and Python
 tests and shared with the native renderer. Atmosphere uses 88 rain streaks, 40
-stars/dust/reflection elements, or 8 elliptical mist/steam glows per region.
+stars/dust elements, 18 elongated reflection ripples, or 8 elliptical mist/steam
+glows per region. Each ripple spans approximately 17–41% of its masked region's
+width, gently changing length and sliding horizontally while fading at its slow
+vertical wrap. Meteors use two 1.15-second flights in each nine-second cycle,
+with six fading tail segments, a head, and a soft glow per flight. At maximum
+allowed speed (3×), meteor events still occur less than once per second.
 These counts and seeds are deterministic; crop/mask coverage controls placement.
 Light and mist glows have radial alpha stops `(0,1)`, `(0.5,0.5)`, `(1,0)`.
 

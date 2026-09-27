@@ -7,3 +7,8 @@ no external assets, and is covered by this toolkit's MIT license.
 
 This keeps a runnable redistributable example without copying Raidio's bundled
 production illustrations into the open-source utility.
+
+The conformance fixtures cover object transforms, all ambient recipes, and light
+signal mapping. Their numeric samples are shared by the Python, browser and
+native renderers. `reaction-conformance.json` also contains preview-only test
+accent envelopes; these do not replace the app's real audio measurements.

@@ -15,15 +15,15 @@ of Raidio's curated illustrations.
 Requires Python 3.12 or later. Install the pinned public release with uv:
 
 ```sh
-uv tool install git+https://github.com/keyanfayaz/raidio-scene-kit.git@v0.1.0
+uv tool install git+https://github.com/keyanfayaz/raidio-scene-kit.git@v0.1.1
 raidio-scene init dream-room
 raidio-scene preview dream-room
 raidio-scene pack dream-room --output dream-room.raidioscene
 raidio-scene validate dream-room.raidioscene --json
 ```
 
-For agents, the pinned [authoring guide v2](https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.0/skills/create-raidio-scene/SKILL.md)
-and [format v2](https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.0/FORMAT.md)
+For agents, the pinned [authoring guide v2](https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.1/skills/create-raidio-scene/SKILL.md)
+and [format v2](https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.1/FORMAT.md)
 are the instructions for this release. If you prefer a standalone checkout:
 
 ```sh
@@ -45,6 +45,12 @@ Use **Inspect transparency (hide base)** with an isolated layer to examine cutou
 edges over a checkerboard. Pause and animation-off preserve the current pose;
 Reduce Motion shows the flattened poster.
 
+The preview's **Test attack across lights** button excites attack, energy and
+sustained layers together. **Energy baseline** reaches full-scale at 1; the
+artwork's own `strength` controls how much illumination is added. Use a lower
+baseline when checking how an energy/sustained light brightens during an accent.
+Scene Kit 0.1.1 adds sparse `meteors` and longer, clearer water `reflection` ripples.
+
 `pack` refreshes image hashes, strips metadata, preserves PNG transparency,
 regenerates resting posters, and writes a reproducible archive. It never changes
 the authoring directory or overwrites an existing output. After replacing image
@@ -53,9 +59,9 @@ stale until updated by your authoring tool.
 
 ## Copy this to your agent
 
-> Install `uv tool install git+https://github.com/keyanfayaz/raidio-scene-kit.git@v0.1.0`
+> Install `uv tool install git+https://github.com/keyanfayaz/raidio-scene-kit.git@v0.1.1`
 > if needed. Read the versioned authoring guide at
-> https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.0/skills/create-raidio-scene/SKILL.md
+> https://github.com/keyanfayaz/raidio-scene-kit/blob/v0.1.1/skills/create-raidio-scene/SKILL.md
 > and its linked format v2 instructions. Help me create my dream listening scene:
 > **[describe your place, mood, time of day, materials and favorite objects]**.
 > Make coordinated landscape and portrait illustrations. Keep the camera,

@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {readFileSync} = require('node:fs');
 const {join} = require('node:path');
-const {objectTransform, lightOpacity, ambientElements, advanceSceneTime} = require('../src/raidio_scene/motion.js');
+const {objectTransform, lightOpacity, ambientElements, advanceSceneTime, reactionSignal, previewSignals} = require('../src/raidio_scene/motion.js');
 const cases = JSON.parse(readFileSync(join(__dirname, '../examples/motion-conformance.json'))).cases;
 
 test('browser transform agrees with every Python and Swift conformance fixture', () => {
@@ -44,4 +44,26 @@ test('pause, animation-off, hiding and poster fallback freeze the existing phase
   for (const disabled of [{animate:false},{paused:true},{reduce:true},{hidden:true},{poster:true}]) {
     assert.equal(advanceSceneTime(7,.1,{...state,...disabled}),7);
   }
+});
+test('all reaction channels and simulated accents match canonical fixtures', () => {
+  const fixture = JSON.parse(readFileSync(join(__dirname, '../examples/reaction-conformance.json')));
+  for (const item of fixture.cases) {
+    assert.ok(Math.abs(reactionSignal(item.reaction,item.signals)-item.expected) < 1e-12);
+  }
+  for (const item of fixture.previewCases) {
+    const actual=previewSignals(item.energy,item.age);
+    for (const channel of ['energy','attack','sustained']) {
+      assert.ok(Math.abs(actual[channel]-item.signals[channel]) < 1e-12);
+    }
+  }
+});
+test('test accent is visible for every light mapping and attack keeps full-energy headroom', () => {
+  const before=previewSignals(.35,null), after=previewSignals(.35,.1);
+  for (const channel of ['energy','attack','sustained']) {
+    assert.ok(reactionSignal(channel,after)>reactionSignal(channel,before)+.2);
+  }
+  assert.equal(reactionSignal('attack',previewSignals(1,null)),.25);
+  assert.equal(reactionSignal('attack',previewSignals(1,0)),1);
+  assert.equal(reactionSignal('energy',previewSignals(1,0)),1);
+  assert.equal(reactionSignal('none',previewSignals(1,0)),0);
 });

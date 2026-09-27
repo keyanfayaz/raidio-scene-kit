@@ -7,6 +7,7 @@ README.md
 examples/README.md
 examples/ambient-conformance.json
 examples/motion-conformance.json
+examples/reaction-conformance.json
 pyproject.toml
 release-files.txt
 schema/scene-v2.schema.json

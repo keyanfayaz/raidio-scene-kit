@@ -7,7 +7,14 @@ from pathlib import Path
 import pytest
 
 from raidio_scene.models import Layer
-from raidio_scene.motion import ambient_elements, light_opacity, object_transform, radial_alpha
+from raidio_scene.motion import (
+    ambient_elements,
+    light_opacity,
+    object_transform,
+    preview_signals,
+    radial_alpha,
+    reaction_signal,
+)
 
 
 def layer(preset: str, **values: object) -> Layer:
@@ -80,3 +87,54 @@ def test_ambient_recipe_matches_native_and_browser_fixture() -> None:
             for key, value in actual.items():
                 if key != "kind":
                     assert value == pytest.approx(sample["element"][key], abs=1e-10)
+
+
+def test_reaction_mapping_and_preview_signals_match_conformance_fixture() -> None:
+    fixture = Path(__file__).parent.parent / "examples" / "reaction-conformance.json"
+    values = json.loads(fixture.read_text())
+    for case in values["cases"]:
+        assert reaction_signal(case["reaction"], case["signals"]) == pytest.approx(case["expected"])
+    for case in values["previewCases"]:
+        assert preview_signals(case["energy"], case["age"]) == pytest.approx(case["signals"])
+
+
+def test_simulated_accent_exercises_all_channels_without_hiding_full_scale() -> None:
+    steady = preview_signals(0.35, None)
+    peak = preview_signals(0.35, 0.1)
+    for reaction in ("energy", "attack", "sustained"):
+        assert reaction_signal(reaction, peak) > reaction_signal(reaction, steady) + 0.2
+    assert preview_signals(0.35, 6)["energy"] == pytest.approx(0.35, abs=0.00001)
+    assert preview_signals(0.35, 6)["sustained"] == pytest.approx(0.35, abs=0.006)
+    full_steady, full_accent = preview_signals(1, None), preview_signals(1, 0)
+    assert full_accent["energy"] == full_accent["sustained"] == 1
+    assert reaction_signal("attack", full_steady) == 0.25
+    assert reaction_signal("attack", full_accent) == 1
+    assert reaction_signal("none", full_accent) == 0
+
+
+def test_meteors_have_sparse_smooth_flights_and_diagonal_tails() -> None:
+    bounds = {"x": 20.0, "y": 10.0, "width": 500.0, "height": 300.0}
+    start = ambient_elements("meteors", bounds, 0)
+    peak = ambient_elements("meteors", bounds, 1.15 / 2)
+    tail = peak[:6]
+    assert len(peak) == 8
+    assert all(element["opacity"] == 0 for element in start)
+    assert all(float(element["width"]) < 0 and float(element["height"]) < 0 for element in tail)
+    assert all(
+        float(a["opacity"]) > float(b["opacity"]) for a, b in zip(tail, tail[1:], strict=False)
+    )
+    assert ambient_elements("meteors", bounds, 3.7) == []
+    # At maximum speed, the two flight starts remain 1.5 seconds apart.
+    assert len(ambient_elements("meteors", bounds, 4.5 + 1.15 / 2)) == 8
+    assert ambient_elements("meteors", bounds, 9.0) == start
+
+
+def test_reflection_is_elongated_water_ripples_with_slow_visible_motion() -> None:
+    bounds = {"x": 20.0, "y": 10.0, "width": 500.0, "height": 300.0}
+    initial = ambient_elements("reflection", bounds, 0)
+    later = ambient_elements("reflection", bounds, 2)
+    assert len(initial) == 18
+    assert all(float(item["width"]) > 40 * float(item["height"]) for item in initial)
+    assert max(float(item["opacity"]) for item in initial) > 0.5
+    assert any(abs(float(a["x"]) - float(b["x"])) > 5 for a, b in zip(initial, later, strict=True))
+    assert all(0 <= float(item["opacity"]) <= 1 for item in later)

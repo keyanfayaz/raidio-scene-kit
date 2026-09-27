@@ -115,7 +115,8 @@
             "dust",
             "stars",
             "steam",
-            "reflection"
+            "reflection",
+            "meteors"
           ],
           "title": "Preset",
           "type": "string"

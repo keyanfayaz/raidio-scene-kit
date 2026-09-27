@@ -10,15 +10,24 @@ main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;padding:28p
 canvas{display:block;max-width:100%;max-height:100%;object-fit:contain}aside{display:flex;flex-direction:column;gap:22px}
 fieldset{border:1px solid #30383c;border-radius:14px;padding:15px}legend{color:#d4d7d8;padding:0 5px}
 label{display:flex;align-items:center;gap:10px;margin:8px 0}select,button{font:inherit;background:#233137;color:#f2f5f5;border:1px solid #45565d;border-radius:8px;padding:8px;max-width:100%}
-button{cursor:pointer}select{width:100%}input[type=range]{width:100%;accent-color:#afd3cc}input[type=checkbox]{accent-color:#afd3cc}
+button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}select{width:100%}input[type=range]{width:100%;accent-color:#afd3cc}input[type=checkbox]{accent-color:#afd3cc}
 small,.note{color:#a5b2b7;font-size:12px}.note{margin:0}.row{display:flex;gap:8px}.pill{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#afd3cc}
-@media(max-width:800px){main{grid-template-columns:1fr;padding:16px}.stage{min-height:280px;height:60vh;position:relative;top:0}aside{display:grid;grid-template-columns:1fr 1fr;gap:12px}canvas{max-height:65vh}header{padding:18px}fieldset{min-width:0}}
+@media(max-width:800px){
+ body{height:100vh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden}
+ header{padding:12px 18px}header p{font-size:13px}h1{font-size:21px}
+ main{width:100%;height:100%;min-height:0;margin:0;overflow:hidden;align-self:stretch;grid-template-columns:1fr;grid-template-rows:40% minmax(0,1fr);padding:12px;gap:12px}
+ .stage{height:100%;min-height:0;position:relative;top:0;border-radius:14px}
+ aside{min-height:0;overflow:auto;overscroll-behavior:contain;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:12px;padding:2px 2px 12px}
+ fieldset{min-width:0;margin:0}canvas{max-height:100%}
+}
+@media(max-width:520px){aside{grid-template-columns:1fr}}
+@media(max-width:800px) and (max-height:500px){header{padding:6px 14px}header p{display:none}.pill{font-size:10px}h1{font-size:18px}main{gap:8px;padding:8px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
 <header><span class="pill">Raidio · Scene Kit</span><h1 id="title">Scene preview</h1><p>Give the room a little life. Keep its architecture still.</p></header>
 <main><section class="stage" aria-label="Scene preview"><canvas id="scene" role="img" aria-label="Layered scene preview"></canvas></section>
-<aside><fieldset><legend>Composition</legend><label for="orientation">Orientation</label><select id="orientation"><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select><label><input id="guides" type="checkbox">Player safe-area guide</label><label><input id="poster" type="checkbox">Flattened poster</label></fieldset>
-<fieldset><legend>Motion & light</legend><label><input id="ambient" type="checkbox" checked>Animate scene</label><label><input id="reactive" type="checkbox" checked>React to test signal</label><label><input id="reduce" type="checkbox">Reduce Motion</label><label><input id="pause" type="checkbox">Pause</label><label for="energy">Energy <output id="value">0.35</output></label><input type="range" id="energy" min="0" max="1" step="0.01" value="0.35"><button id="attack">Test attack</button><p class="note">Manual test signals, not beat detection. The toolkit never captures audio.</p></fieldset>
+<aside tabindex="0" aria-label="Scene preview controls"><fieldset><legend>Composition</legend><label for="orientation">Orientation</label><select id="orientation"><option value="landscape">Landscape</option><option value="portrait">Portrait</option></select><label><input id="guides" type="checkbox">Player safe-area guide</label><label><input id="poster" type="checkbox">Flattened poster</label></fieldset>
+<fieldset><legend>Motion & light</legend><label><input id="ambient" type="checkbox" checked>Animate scene</label><label><input id="reactive" type="checkbox" checked>React to test signal</label><label><input id="reduce" type="checkbox">Reduce Motion</label><label><input id="pause" type="checkbox">Pause</label><label for="energy">Energy baseline <output id="value">0.35</output></label><input type="range" id="energy" min="0" max="1" step="0.01" value="0.35"><button id="attack">Test attack across lights</button><p class="note" id="signal-note">A test accent pulses attacks and raises energy and sustained light. These are simulated signals, not beat detection.</p><p class="note">Energy 1 is full-scale; layer strength controls the amount of light. The toolkit never captures audio.</p></fieldset>
 <fieldset><legend>Inspect the layers</legend><label for="layer">Show</label><select id="layer"><option value="all">Complete scene</option><option value="base">Clean base only</option></select><label><input id="hide" type="checkbox">Hide moving objects</label><label><input id="masks" type="checkbox">Show mask coverage</label><label><input id="checker" type="checkbox">Inspect transparency (hide base)</label><p class="note">Check that moving objects are absent from the clean base and masks exclude walls and window frames.</p></fieldset>
 <p class="note">Offline preview. Native device performance and visual review are still required. Files stay on this computer.</p></aside></main>
 <script type="application/json" id="data">__SCENE_DATA__</script>
@@ -28,7 +37,7 @@ __MOTION_CODE__
 const scene=JSON.parse(document.getElementById('data').textContent),$=id=>document.getElementById(id);
 const canvas=$('scene'),ctx=canvas.getContext('2d'),images={},scratch=document.createElement('canvas');
 const c=scratch.getContext('2d');
-let elapsed=0,last=0,attack=0,frame=0,ready=false,settleStarted=0;
+let elapsed=0,last=0,accentAge=null,frame=0,ready=false,settleStarted=0;
 let reactionWasActive=true,lastSignals={},settledSignals={};
 $('title').textContent=scene.title;
 $('reduce').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -39,7 +48,7 @@ function moving(){return active()&&$('ambient').checked}
 function reacting(){return active()&&$('reactive').checked}
 function syncReaction(now){
  const enabled=reacting();
- if(reactionWasActive&&!enabled){settleStarted=document.hidden||posterVisible()?0:now;settledSignals={...lastSignals};}
+ if(reactionWasActive&&!enabled){settleStarted=document.hidden||posterVisible()?0:now;settledSignals={...lastSignals};accentAge=null;}
  if(enabled)settleStarted=0;
  reactionWasActive=enabled;
 }
@@ -52,7 +61,7 @@ function updateLayers(){
 }
 function signal(layer){
  if(layer.reaction==='none')return 0;
- if(reacting())return layer.reaction==='attack'?attack:Number($('energy').value);
+ if(reacting())return reactionSignal(layer.reaction,previewSignals(Number($('energy').value),accentAge));
  return settleStarted?(settledSignals[layer.id]||0)*Math.max(0,1-(performance.now()-settleStarted)/300):0;
 }
 function glow(bounds,color){
@@ -110,11 +119,14 @@ function tick(now){
  if(last&&now-last<1000/24){frame=requestAnimationFrame(tick);return;}
  frame=0;const delta=last?Math.min((now-last)/1000,.1):0;last=now;syncReaction(now);
  elapsed=advanceSceneTime(elapsed,delta,{animate:$('ambient').checked,paused:$('pause').checked,reduce:$('reduce').checked,hidden:document.hidden,poster:$('poster').checked});
- attack*=Math.exp(-delta*5);draw();
- if((active()&&($('ambient').checked||attack>.005))||(settleStarted&&now-settleStarted<300))frame=requestAnimationFrame(tick);else last=0;
+ if(accentAge!==null&&reacting()){accentAge+=delta;if(accentAge>6)accentAge=null;}
+ $('attack').disabled=!reacting();
+ $('signal-note').textContent=!reacting()?'Resume playback, turn off Reduce Motion, and enable React to test signal to try an accent.':Number($('energy').value)>=.99?'Energy and sustained lights are already at full-scale. Test attack still adds a pulse to attack layers; lower energy to see every light brighten.':'A test accent pulses attacks and raises energy and sustained light. These are simulated signals, not beat detection.';
+ draw();
+ if((active()&&($('ambient').checked||accentAge!==null))||(settleStarted&&now-settleStarted<300))frame=requestAnimationFrame(tick);else last=0;
 }
 function refresh(){if(ready&&!frame){last=0;frame=requestAnimationFrame(tick)}}
 Promise.all(Object.entries(scene.resources).map(([key,r])=>new Promise((resolve,reject)=>{const image=new Image;image.onload=()=>{images[key]=image;resolve()};image.onerror=reject;image.src=r.data}))).then(()=>{ready=true;updateLayers();refresh()}).catch(()=>{$('title').textContent='Preview image could not be decoded'});
 for(const input of document.querySelectorAll('input,select'))input.addEventListener('input',()=>{$('value').textContent=Number($('energy').value).toFixed(2);if(input.id==='orientation')updateLayers();refresh()});
-$('attack').addEventListener('click',()=>{attack=1;refresh()});document.addEventListener('visibilitychange',()=>{last=0;refresh()});
+$('attack').addEventListener('click',()=>{if(reacting()){accentAge=0;refresh()}});document.addEventListener('visibilitychange',()=>{last=0;refresh()});
 </script></html>

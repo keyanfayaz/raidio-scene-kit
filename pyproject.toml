@@ -1,6 +1,6 @@
 [project]
 name = "raidio-scene-kit"
-version = "0.1.0"
+version = "0.1.1"
 description = "Open, agent-first authoring tools for stationary, layered Raidio scenes"
 readme = "README.md"
 license = "MIT"
