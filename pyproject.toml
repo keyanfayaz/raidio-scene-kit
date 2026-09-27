@@ -1,0 +1,35 @@
+[project]
+name = "raidio-scene-kit"
+version = "0.1.0"
+description = "Open, agent-first authoring tools for stationary, layered Raidio scenes"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.10,<3", "pillow>=11,<13"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.8,<1", "mypy>=1.13,<2"]
+
+[project.scripts]
+raidio-scene = "raidio_scene.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raidio_scene"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]

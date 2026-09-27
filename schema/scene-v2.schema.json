@@ -1,0 +1,379 @@
+{
+  "$defs": {
+    "Layer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "foreground",
+            "object",
+            "ambient",
+            "light"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "resource": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resource"
+        },
+        "mask": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mask"
+        },
+        "x": {
+          "default": 0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "default": 0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Y",
+          "type": "number"
+        },
+        "width": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Width",
+          "type": "number"
+        },
+        "height": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Height",
+          "type": "number"
+        },
+        "anchorX": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Anchorx",
+          "type": "number"
+        },
+        "anchorY": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Anchory",
+          "type": "number"
+        },
+        "opacity": {
+          "default": 1,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Opacity",
+          "type": "number"
+        },
+        "blend": {
+          "default": "normal",
+          "enum": [
+            "normal",
+            "screen"
+          ],
+          "title": "Blend",
+          "type": "string"
+        },
+        "preset": {
+          "enum": [
+            "still",
+            "sway",
+            "cloth",
+            "rotate",
+            "drift",
+            "flame",
+            "rain",
+            "mist",
+            "dust",
+            "stars",
+            "steam",
+            "reflection"
+          ],
+          "title": "Preset",
+          "type": "string"
+        },
+        "amplitude": {
+          "default": 0.01,
+          "maximum": 0.05,
+          "minimum": 0,
+          "title": "Amplitude",
+          "type": "number"
+        },
+        "speed": {
+          "default": 1,
+          "maximum": 3,
+          "minimum": 0.05,
+          "title": "Speed",
+          "type": "number"
+        },
+        "phase": {
+          "default": 0,
+          "maximum": 6.283185307179586,
+          "minimum": 0,
+          "title": "Phase",
+          "type": "number"
+        },
+        "reaction": {
+          "default": "none",
+          "enum": [
+            "none",
+            "energy",
+            "attack",
+            "sustained"
+          ],
+          "title": "Reaction",
+          "type": "string"
+        },
+        "strength": {
+          "default": 0.3,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Strength",
+          "type": "number"
+        },
+        "color": {
+          "default": "#FFD6A0",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "title": "Color",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "preset"
+      ],
+      "title": "Layer",
+      "type": "object"
+    },
+    "Orientation": {
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 2048,
+          "title": "Width",
+          "type": "integer"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 2048,
+          "title": "Height",
+          "type": "integer"
+        },
+        "base": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Base",
+          "type": "string"
+        },
+        "poster": {
+          "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+          "title": "Poster",
+          "type": "string"
+        },
+        "layers": {
+          "items": {
+            "$ref": "#/$defs/Layer"
+          },
+          "maxItems": 12,
+          "title": "Layers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "width",
+        "height",
+        "base",
+        "poster"
+      ],
+      "title": "Orientation",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Author"
+        },
+        "tool": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tool"
+        },
+        "license": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "License"
+        },
+        "sourceDescription": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sourcedescription"
+        }
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Resource": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "pattern": "^resources/[a-z][a-z0-9_-]{0,63}\\.(png|jpg)$",
+          "title": "Path",
+          "type": "string"
+        },
+        "mediaType": {
+          "enum": [
+            "image/jpeg",
+            "image/png"
+          ],
+          "title": "Mediatype",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 2048,
+          "title": "Width",
+          "type": "integer"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 2048,
+          "title": "Height",
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "mediaType",
+        "width",
+        "height",
+        "sha256"
+      ],
+      "title": "Resource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 2,
+      "title": "Version",
+      "type": "integer"
+    },
+    "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Provenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "resources": {
+      "maxProperties": 32,
+      "minProperties": 2,
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]{0,63}$": {
+          "$ref": "#/$defs/Resource"
+        }
+      },
+      "title": "Resources",
+      "type": "object"
+    },
+    "landscape": {
+      "$ref": "#/$defs/Orientation"
+    },
+    "portrait": {
+      "$ref": "#/$defs/Orientation"
+    }
+  },
+  "required": [
+    "version",
+    "title",
+    "resources",
+    "landscape",
+    "portrait"
+  ],
+  "title": "SceneManifest",
+  "type": "object"
+}
